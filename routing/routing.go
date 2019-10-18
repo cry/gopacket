@@ -211,10 +211,11 @@ loop:
 	if err != nil {
 		return nil, err
 	}
-	for i, iface := range ifaces {
-		if i != iface.Index-1 {
-			return nil, fmt.Errorf("out of order iface %d = %v", i, iface)
-		}
+	// Ensure ifaces are sorted instead of checking if array indices match
+	sort.Slice(ifaces[:], func(i, j int) bool {
+		return ifaces[i].Index < ifaces[j].Index
+	})
+	for _, iface := range ifaces {
 		rtr.ifaces = append(rtr.ifaces, iface)
 		var addrs ipAddrs
 		ifaceAddrs, err := iface.Addrs()
